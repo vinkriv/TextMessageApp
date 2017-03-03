@@ -1,13 +1,18 @@
 package com.example.a10017404.textmessageapp;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.provider.Telephony;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.widget.TextView;
 
@@ -22,6 +27,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS)!= PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, 1);
+        }
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 1);
+        }
         textView = (TextView)findViewById(R.id.textView);
         receiver = new TextMonitor();
         IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
@@ -38,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
                 messages[x]=SmsMessage.createFromPdu((byte[])pdus[x],bundle.getString("format"));
             }
             textView.setText(messages[0].getMessageBody());
+            SmsManager manager = SmsManager.getDefault();
+            manager.sendTextMessage(messages[0].getOriginatingAddress(),null,"Hi",null,null);
         }
     }
 }
