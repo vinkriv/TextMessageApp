@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 
@@ -36,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
             SmsMessage[] messages = new SmsMessage[pdus.length];
             for (int x=0;x<pdus.length;x++){
                 messages[x]=SmsMessage.createFromPdu((byte[])pdus[x],bundle.getString("format"));
+                Toast.makeText(context, messages[0].getMessageBody(), Toast.LENGTH_SHORT).show();
             }
-            textView.setText(messages[0].getMessageBody());
+
         }
     }
 }
