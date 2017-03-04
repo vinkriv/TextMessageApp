@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.provider.Telephony;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -44,13 +45,20 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             Object[] pdus = (Object[])bundle.get("pdus");
-            SmsMessage[] messages = new SmsMessage[pdus.length];
+            final SmsMessage[] messages = new SmsMessage[pdus.length];
             for (int x=0;x<pdus.length;x++){
                 messages[x]=SmsMessage.createFromPdu((byte[])pdus[x],bundle.getString("format"));
             }
             textView.setText(messages[0].getMessageBody());
-            SmsManager manager = SmsManager.getDefault();
-            manager.sendTextMessage(messages[0].getOriginatingAddress(),null,"Hi",null,null);
+            final SmsManager manager = SmsManager.getDefault();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    manager.sendTextMessage(messages[0].getOriginatingAddress(),null,"Hi",null,null);
+                }
+            },2000);
         }
+
     }
 }
