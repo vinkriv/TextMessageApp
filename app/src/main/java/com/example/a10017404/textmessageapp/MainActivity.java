@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    manager.sendTextMessage(messages[0].getOriginatingAddress(),null,"Hi",null,null);
+                    manager.sendTextMessage(messages[0].getOriginatingAddress(),null,messages[0].getMessageBody(),null,null);
                 }
             },2000);
         }
