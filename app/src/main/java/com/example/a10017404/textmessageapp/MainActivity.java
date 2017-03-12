@@ -22,6 +22,14 @@ import java.lang.reflect.Array;
 public class MainActivity extends AppCompatActivity {
     TextView textView;
     BroadcastReceiver receiver;
+    String stage=null;
+    int responsetwo;
+    String[] ReceivedOne = {"hi", "hello", "ohayo", "namaskar"};
+    String[] ResponsesOne = {"Hi", "Whassup", "Hola", "Hello"};
+    String[] ReceivedTwo = {"where", "major", "campus"};
+    String[] ResponsesTwo = {"New Jersey", "School of Arts and Sciences", "Computer Science", "Livingston"};
+    String[] ReceivedThree = {"bye", "see ya", "adios", "later"};
+    String[] ResponsesThree = {"Catch you later", "Cya", "Bye", "Au revoir"};
 
 
     @Override
@@ -49,13 +57,43 @@ public class MainActivity extends AppCompatActivity {
             for (int x=0;x<pdus.length;x++){
                 messages[x]=SmsMessage.createFromPdu((byte[])pdus[x],bundle.getString("format"));
             }
-            textView.setText(messages[0].getMessageBody());
+
+            for (int x=0;x<4;x++){
+                if (stage==null && messages[0].getMessageBody().toLowerCase().contains(ReceivedOne[x])){
+                    stage="Greeting";
+                    x=4;
+                }
+                else if ((stage=="Greeting" || stage=="Error") && messages[0].getMessageBody().toLowerCase().contains(ReceivedTwo[x])){
+                    stage="Question";
+                    responsetwo = x;
+                    x=4;
+                }
+                else if ((stage=="Question" || stage=="Error") && messages[0].getMessageBody().toLowerCase().contains(ReceivedThree[x])){
+                    stage="Farewell";
+                    x=4;
+                }
+                else stage="Error";
+            }
+
+            textView.setText(stage);
             final SmsManager manager = SmsManager.getDefault();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    manager.sendTextMessage(messages[0].getOriginatingAddress(),null,messages[0].getMessageBody(),null,null);
+                    int rand =  (int)(Math.random()*4);
+                    if (stage=="Greeting"){
+                        manager.sendTextMessage(messages[0].getOriginatingAddress(),null,ResponsesOne[rand],null,null);
+                    }
+                    else if (stage=="Question"){
+                        manager.sendTextMessage(messages[0].getOriginatingAddress(),null,ResponsesTwo[responsetwo],null,null);
+                    }
+                    else if (stage=="Farewell"){
+                        manager.sendTextMessage(messages[0].getOriginatingAddress(),null,ResponsesThree[rand],null,null);
+                    }
+                    else if (stage=="Error"){
+                        manager.sendTextMessage(messages[0].getOriginatingAddress(),null,"Could we please move on?",null,null);
+                    }
                 }
             },2000);
         }
